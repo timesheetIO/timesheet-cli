@@ -35,15 +35,12 @@ export function registerTeamsCommands(program: Command): void {
 
       const columns: ColumnDef<Team>[] = [
         { key: 'id', header: 'ID', width: 36 },
-        { key: 'title', header: 'Name', width: 30 },
+        { key: 'name', header: 'Name', width: 30 },
         {
           key: 'members',
           header: 'Members',
           width: 10,
-          format: (v) => {
-            const members = v as unknown[] | undefined;
-            return members?.length?.toString() || '0';
-          },
+          format: (v) => String((v as number) ?? 0),
         },
       ];
 

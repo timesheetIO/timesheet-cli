@@ -43,6 +43,9 @@ export const configSchema = {
   defaultTeamId: {
     type: 'string' as const,
   },
+  defaultOrganizationId: {
+    type: 'string' as const,
+  },
   confirmDeletes: {
     type: 'boolean' as const,
     default: defaultConfig.confirmDeletes,

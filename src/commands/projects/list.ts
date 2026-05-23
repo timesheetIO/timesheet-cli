@@ -4,7 +4,7 @@ import { createFormatter, output, newline } from '../../output/index.js';
 import { createSpinner } from '../../utils/index.js';
 import { getConfig } from '../../config/index.js';
 import type { GlobalOptions, ColumnDef } from '../../types/index.js';
-import type { Project } from '@timesheet/sdk';
+import type { Project, ProjectListParams } from '@timesheet/sdk';
 
 export function registerProjectsListCommand(parent: Command): void {
   parent
@@ -16,10 +16,11 @@ export function registerProjectsListCommand(parent: Command): void {
       'active'
     )
     .option('-t, --team <team-id>', 'Filter by team ID')
+    .option('-q, --search <query>', 'Free-text search')
     .option('-l, --limit <number>', 'Limit results', '20')
     .action(
       async (
-        options: { status: string; team?: string; limit: string },
+        options: { status: string; team?: string; search?: string; limit: string },
         command: Command
       ) => {
         const globalOptions = command.optsWithGlobals<GlobalOptions>();
@@ -31,22 +32,15 @@ export function registerProjectsListCommand(parent: Command): void {
 
         const limit = parseInt(options.limit, 10) || getConfig('paginationLimit');
 
-        const page = await client.projects.list({
-          limit,
-          // Note: SDK might have different filter parameters
-        });
-
-        // Filter by status if specified (client-side filtering)
-        let projects = page.items;
-        if (options.status !== 'all') {
-          const isActive = options.status === 'active';
-          projects = projects.filter((p) => !p.archived === isActive);
+        const params: ProjectListParams = { limit };
+        if (options.status === 'active' || options.status === 'inactive' || options.status === 'all') {
+          params.status = options.status;
         }
+        if (options.team) params.teamId = options.team;
+        if (options.search) params.search = options.search;
 
-        // Filter by team if specified
-        if (options.team) {
-          projects = projects.filter((p) => p.team?.id === options.team);
-        }
+        const page = await client.projects.list(params);
+        const projects = page.items;
 
         spinner.stop();
 

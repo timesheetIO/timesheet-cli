@@ -91,6 +91,7 @@ export interface CLIConfig {
   timeFormat: string;
   defaultProjectId?: string;
   defaultTeamId?: string;
+  defaultOrganizationId?: string;
   confirmDeletes: boolean;
   paginationLimit: number;
 }

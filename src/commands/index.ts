@@ -8,6 +8,15 @@ import { registerTagsCommands } from './tags/index.js';
 import { registerReportsCommands } from './reports/index.js';
 import { registerProfileCommands } from './profile/index.js';
 import { registerConfigCommands } from './config/index.js';
+import { registerAbsencesCommands } from './absences/index.js';
+import { registerAbsenceTypesCommands } from './absence-types/index.js';
+import { registerContractsCommands } from './contracts/index.js';
+import { registerOrganizationsCommands } from './organizations/index.js';
+import { registerExpensesCommands } from './expenses/index.js';
+import { registerNotesCommands } from './notes/index.js';
+import { registerPausesCommands } from './pauses/index.js';
+import { registerTodosCommands } from './todos/index.js';
+import { registerRatesCommands } from './rates/index.js';
 
 /**
  * Register all CLI commands
@@ -22,4 +31,13 @@ export function registerCommands(program: Command): void {
   registerReportsCommands(program);
   registerProfileCommands(program);
   registerConfigCommands(program);
+  registerAbsencesCommands(program);
+  registerAbsenceTypesCommands(program);
+  registerContractsCommands(program);
+  registerOrganizationsCommands(program);
+  registerExpensesCommands(program);
+  registerNotesCommands(program);
+  registerPausesCommands(program);
+  registerTodosCommands(program);
+  registerRatesCommands(program);
 }

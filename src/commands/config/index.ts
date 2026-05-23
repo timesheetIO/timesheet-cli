@@ -4,6 +4,7 @@ import {
   setConfig,
   getConfigDir,
   defaultConfig,
+  configSchema,
 } from '../../config/index.js';
 import { createFormatter, output, newline } from '../../output/index.js';
 import type { GlobalOptions, CLIConfig } from '../../types/index.js';
@@ -69,7 +70,7 @@ export function registerConfigCommands(program: Command): void {
         const formatter = createFormatter(globalOptions);
 
         // Validate key
-        const validKeys = Object.keys(defaultConfig) as (keyof CLIConfig)[];
+        const validKeys = Object.keys(configSchema) as (keyof CLIConfig)[];
         if (!validKeys.includes(key as keyof CLIConfig)) {
           output(
             formatter,
@@ -87,10 +88,11 @@ export function registerConfigCommands(program: Command): void {
         const typedKey = key as keyof CLIConfig;
         let parsedValue: CLIConfig[keyof CLIConfig];
 
+        const schemaType = configSchema[typedKey]?.type;
         const defaultValue = defaultConfig[typedKey];
-        if (typeof defaultValue === 'boolean') {
+        if (schemaType === 'boolean' || typeof defaultValue === 'boolean') {
           parsedValue = value === 'true' || value === '1';
-        } else if (typeof defaultValue === 'number') {
+        } else if (schemaType === 'number' || typeof defaultValue === 'number') {
           parsedValue = parseInt(value, 10);
           if (isNaN(parsedValue as number)) {
             output(

@@ -4,6 +4,7 @@ import { registerProjectsShowCommand } from './show.js';
 import { registerProjectsCreateCommand } from './create.js';
 import { registerProjectsUpdateCommand } from './update.js';
 import { registerProjectsDeleteCommand } from './delete.js';
+import { registerProjectsMembersCommands } from './members/index.js';
 
 export function registerProjectsCommands(program: Command): void {
   const projects = program
@@ -16,4 +17,5 @@ export function registerProjectsCommands(program: Command): void {
   registerProjectsCreateCommand(projects);
   registerProjectsUpdateCommand(projects);
   registerProjectsDeleteCommand(projects);
+  registerProjectsMembersCommands(projects);
 }

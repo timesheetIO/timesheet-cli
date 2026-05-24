@@ -17,6 +17,7 @@ import { registerNotesCommands } from './notes/index.js';
 import { registerPausesCommands } from './pauses/index.js';
 import { registerTodosCommands } from './todos/index.js';
 import { registerRatesCommands } from './rates/index.js';
+import { registerSkillCommands } from './skill/index.js';
 
 /**
  * Register all CLI commands
@@ -40,4 +41,5 @@ export function registerCommands(program: Command): void {
   registerPausesCommands(program);
   registerTodosCommands(program);
   registerRatesCommands(program);
+  registerSkillCommands(program);
 }

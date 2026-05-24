@@ -9,9 +9,11 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "skill"
   ],
   "scripts": {
+    "prebuild": "node scripts/sync-skill.mjs",
     "build": "tsup",
     "dev": "tsup --watch",
     "start": "node dist/index.js",
@@ -40,7 +42,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "@timesheet/sdk": "^1.1.0",
+    "@timesheet/sdk": "^1.1.1",
     "chalk": "^5.3.0",
     "cli-table3": "^0.6.5",
     "commander": "^12.1.0",

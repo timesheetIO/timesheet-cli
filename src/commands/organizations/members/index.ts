@@ -94,6 +94,12 @@ export function registerOrganizationsMembersCommands(parent: Command): void {
             width: 10,
             format: (v) => (v ? 'active' : 'none'),
           },
+          {
+            key: 'invited',
+            header: 'Invited',
+            width: 8,
+            format: (v) => (v ? 'yes' : 'no'),
+          },
         ];
 
         output(formatter, formatter.formatTable(page.items, columns));
@@ -136,6 +142,9 @@ export function registerOrganizationsMembersCommands(parent: Command): void {
         if (member.displayName) data['Name'] = member.displayName;
         if (member.hasActiveContract !== undefined) {
           data['Active Contract'] = member.hasActiveContract ? 'Yes' : 'No';
+        }
+        if (member.invited !== undefined) {
+          data['Invited'] = member.invited ? 'Yes' : 'No';
         }
         if (member.teamAssignments?.length) {
           data['Teams'] = member.teamAssignments
@@ -273,11 +282,12 @@ export function registerOrganizationsMembersCommands(parent: Command): void {
     .description('Remove a member from an organization')
     .argument('<member-id>', 'Organization member (permission) ID')
     .option('-o, --organization <id>', 'Organization ID')
+    .option('--invited', 'Permanently delete an invited (not-yet-activated) member')
     .option('-f, --force', 'Skip confirmation prompt')
     .action(
       async (
         memberId: string,
-        options: { organization?: string; force?: boolean },
+        options: { organization?: string; invited?: boolean; force?: boolean },
         command: Command
       ) => {
         const globalOptions = command.optsWithGlobals<GlobalOptions>();
@@ -296,7 +306,9 @@ export function registerOrganizationsMembersCommands(parent: Command): void {
             {
               type: 'confirm',
               name: 'confirm',
-              message: `Remove member ${memberId} from organization?`,
+              message: options.invited
+                ? `Permanently delete invited member ${memberId}?`
+                : `Remove member ${memberId} from organization?`,
               default: false,
             },
           ]);
@@ -306,15 +318,24 @@ export function registerOrganizationsMembersCommands(parent: Command): void {
           }
         }
 
-        spinner.start('Removing member...');
-        await client.organizations.removeMember(organizationId, memberId);
+        spinner.start(options.invited ? 'Deleting invited member...' : 'Removing member...');
+        if (options.invited) {
+          await client.organizations.removeInvitedMember(organizationId, memberId);
+        } else {
+          await client.organizations.removeMember(organizationId, memberId);
+        }
         spinner.stop();
 
         if (globalOptions.json) {
           output(formatter, { removed: true, memberId });
           return;
         }
-        output(formatter, formatter.formatSuccess('Organization member removed.'));
+        output(
+          formatter,
+          formatter.formatSuccess(
+            options.invited ? 'Invited organization member deleted.' : 'Organization member removed.'
+          )
+        );
       }
     );
 }

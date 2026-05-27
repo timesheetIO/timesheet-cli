@@ -25,6 +25,7 @@ export const ExitCode = {
   API_ERROR: 4,
   RATE_LIMIT: 5,
   NETWORK_ERROR: 6,
+  TIER_ERROR: 7,
 } as const;
 
 export type ExitCodeValue = (typeof ExitCode)[keyof typeof ExitCode];

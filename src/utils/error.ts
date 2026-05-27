@@ -20,6 +20,46 @@ export class CLIError extends Error {
 }
 
 /**
+ * Build a human-readable message from a backend tier-gate 402 response body.
+ * Body shape: { error, required, current }.
+ */
+function formatTierErrorMessage(responseBody: string | undefined): string {
+  let payload: { error?: string; required?: string; current?: string } = {};
+  if (responseBody) {
+    try {
+      payload = JSON.parse(responseBody);
+    } catch {
+      // Fall through with empty payload
+    }
+  }
+
+  const required = payload.required ? capitalize(payload.required) : null;
+  const current = payload.current ? capitalize(payload.current) : null;
+
+  switch (payload.error) {
+    case 'no_subscription':
+      return 'This command requires an active subscription.';
+    case 'subscription_expired':
+      return current
+        ? `Your ${current} subscription has expired.`
+        : 'Your subscription has expired.';
+    case 'tier_insufficient':
+      if (required && current) {
+        return `This command requires ${required}. You are on ${current}.`;
+      }
+      return required
+        ? `This command requires ${required}.`
+        : 'This command requires a higher subscription tier.';
+    default:
+      return 'This command requires a higher subscription tier.';
+  }
+}
+
+function capitalize(value: string): string {
+  return value.length === 0 ? value : value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+}
+
+/**
  * Map SDK errors to CLI errors with appropriate exit codes
  */
 export function mapSdkError(error: unknown): CLIError {
@@ -41,6 +81,10 @@ export function mapSdkError(error: unknown): CLIError {
       ? `Rate limit exceeded. Please try again after ${retryAfter.toLocaleTimeString()}.`
       : 'Rate limit exceeded. Please try again later.';
     return new CLIError(message, ExitCode.RATE_LIMIT, error);
+  }
+
+  if (error instanceof TimesheetApiError && error.statusCode === 402) {
+    return new CLIError(formatTierErrorMessage(error.responseBody), ExitCode.TIER_ERROR, error);
   }
 
   if (error instanceof TimesheetApiError) {
@@ -90,6 +134,11 @@ export function handleError(error: unknown, quiet = false): never {
       console.error('  timesheet auth login');
       console.error('\nOr set an API key:');
       console.error('  export TIMESHEET_API_KEY=your-api-key');
+    }
+
+    if (cliError.exitCode === ExitCode.TIER_ERROR) {
+      console.error('\nUpgrade your subscription:');
+      console.error('  https://timesheet.io/subscription/edit');
     }
   }
 

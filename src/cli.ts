@@ -11,7 +11,7 @@ export function createProgram(): Command {
   program
     .name('timesheet')
     .description('Timesheet.io CLI for time tracking')
-    .version('1.0.0', '-v, --version', 'Display version number')
+    .version('1.1.0', '-v, --version', 'Display version number')
     .option('--json', 'Output as JSON')
     .option('--no-color', 'Disable colors')
     .option('--api-key <key>', 'API key for authentication')

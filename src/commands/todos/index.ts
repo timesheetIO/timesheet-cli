@@ -56,7 +56,7 @@ export function registerTodosCommands(program: Command): void {
         if (options.search) params.search = options.search;
 
         spinner.start('Loading todos...');
-        const page = await client.todos.list(params);
+        const page = await client.todos.search(params);
         spinner.stop();
 
         if (globalOptions.json) {

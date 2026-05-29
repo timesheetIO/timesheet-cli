@@ -28,7 +28,7 @@ export function registerOrganizationsListCommand(parent: Command): void {
         const params: OrganizationListParams = { limit };
         if (options.search) params.search = options.search;
 
-        const page = await client.organizations.list(params);
+        const page = await client.organizations.search(params);
         spinner.stop();
 
         if (globalOptions.json) {

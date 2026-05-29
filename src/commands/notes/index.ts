@@ -59,7 +59,7 @@ export function registerNotesCommands(program: Command): void {
         if (options.search) params.search = options.search;
 
         spinner.start('Loading notes...');
-        const page = await client.notes.list(params);
+        const page = await client.notes.search(params);
         spinner.stop();
 
         if (globalOptions.json) {

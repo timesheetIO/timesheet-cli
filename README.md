@@ -104,6 +104,27 @@ timesheet tags create "Urgent" --color 1
 timesheet tags delete <id>
 ```
 
+### Filtering & Search
+
+Most `list` commands accept filters that are applied server-side, including a free-text `--search`:
+
+```bash
+# Free-text search
+timesheet projects list --search website
+timesheet teams list --search design
+
+# Filter expenses by project and date range
+timesheet expenses list --project <project-id> --start-date 2024-01-01 --end-date 2024-01-31
+
+# Filter absences by user, type and status
+timesheet absences list --user <user-id> --type <type-id> --status approved
+
+# Filter contracts by user
+timesheet contracts list --user <user-id>
+```
+
+Use `--help` on any command to see its available filters, e.g. `timesheet expenses list --help`.
+
 ### Reports
 
 ```bash

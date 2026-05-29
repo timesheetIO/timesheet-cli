@@ -100,7 +100,7 @@ export function registerContractsCommands(program: Command): void {
 
         const limit = parseInt(options.limit, 10) || getConfig('paginationLimit');
         const params: ContractListParams = { limit };
-        if (options.user) params.userId = options.user;
+        if (options.user) params.user = options.user;
         if (options.status) params.status = options.status;
         if (options.search) params.search = options.search;
 

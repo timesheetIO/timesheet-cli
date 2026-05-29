@@ -28,7 +28,7 @@ export function registerTeamsListCommand(parent: Command): void {
         const params: TeamListParams = { limit };
         if (options.search) params.search = options.search;
 
-        const page = await client.teams.list(params);
+        const page = await client.teams.search(params);
         spinner.stop();
 
         if (globalOptions.json) {

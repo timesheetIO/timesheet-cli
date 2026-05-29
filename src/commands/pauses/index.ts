@@ -51,7 +51,7 @@ export function registerPausesCommands(program: Command): void {
         if (options.search) params.search = options.search;
 
         spinner.start('Loading pauses...');
-        const page = await client.pauses.list(params);
+        const page = await client.pauses.search(params);
         spinner.stop();
 
         if (globalOptions.json) {

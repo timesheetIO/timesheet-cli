@@ -5,15 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.1.0] - 2026-05-29
 
-### Added
-- Initial CLI implementation with timer, project, task, and team commands
-- OAuth 2.1 with PKCE authentication flow
-- API key authentication for CI/CD environments
-- Multiple output formats: human-readable tables, pipe-friendly TSV, JSON
-- Configuration management via `~/.timesheet-cli/`
-- Environment variable overrides with `TIMESHEET_` prefix
+### Changed
+- Upgraded `@timesheet/sdk` to `1.2.0`
+- List commands now use the SDK `search()` endpoint so filters that the plain list endpoint silently ignored are applied server-side: `organizations`, `rates`, `projects`, `pauses`, and `teams` (free-text `--search`); `todos` (assigned users, `--search`); `expenses` (`--document`, `--project`, date range, `--search`); `notes` (`--document`, date range, `--search`); `absences` (`--user`, `--type`, `--status`, date range, `--year`, `--search`)
+
+### Fixed
+- `contracts list --user` now filters by user (the value was sent under a parameter the API did not recognize and was ignored)
+- `reports summary` project grouping no longer breaks after the SDK removed `Task.projectId`; it now reads the nested project object
 
 ## [1.0.0] - 2025-01-05
 

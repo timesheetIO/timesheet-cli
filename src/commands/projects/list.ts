@@ -39,7 +39,7 @@ export function registerProjectsListCommand(parent: Command): void {
         if (options.team) params.teamId = options.team;
         if (options.search) params.search = options.search;
 
-        const page = await client.projects.list(params);
+        const page = await client.projects.search(params);
         const projects = page.items;
 
         spinner.stop();

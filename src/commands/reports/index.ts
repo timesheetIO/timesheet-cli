@@ -83,7 +83,7 @@ export function registerReportsCommands(program: Command): void {
         // Group by project
         const byProject = new Map<string, { title: string; duration: number }>();
         for (const task of tasks) {
-          const projectId = task.projectId || 'unknown';
+          const projectId = task.project?.id || 'unknown';
           const projectTitle = task.project?.title || 'Unknown';
           const current = byProject.get(projectId) || {
             title: projectTitle,

@@ -67,7 +67,7 @@ export function registerExpensesCommands(program: Command): void {
         if (options.search) params.search = options.search;
 
         spinner.start('Loading expenses...');
-        const page = await client.expenses.list(params);
+        const page = await client.expenses.search(params);
         spinner.stop();
 
         if (globalOptions.json) {

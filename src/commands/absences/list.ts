@@ -60,7 +60,7 @@ export function registerAbsencesListCommand(parent: Command): void {
         if (options.excludeRejected) params.excludeRejectedCancelled = true;
         if (options.search) params.search = options.search;
 
-        const page = await client.absences.list(organizationId, params);
+        const page = await client.absences.search(organizationId, params);
 
         spinner.stop();
 

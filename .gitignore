@@ -5,7 +5,8 @@ node_modules/
 dist/
 
 # Bundled skill (synced from tools/skills/timesheet-plugin on prebuild)
-skill/
+# Anchored to the package root so it does not also ignore src/commands/skill/
+/skill/
 
 # Environment files (keep .env.example)
 .env

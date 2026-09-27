@@ -5,13 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.1] - 2026-09-01
+## [1.1.1] - 2026-09-27
 
 ### Changed
+- The bundled skill (`timesheet skill install`) uses the Timesheet connector's tools when they
+  are available and the CLI otherwise, and documents work days as `1111100`.
 - Package metadata for npm: `homepage` now points at timesheet.io, and `author` is
   normalized to `timesheet.io <support@timesheet.io>` across every Timesheet package.
 - Copyright reassigned from the previous holder to `Timesheet - Mobile Time Tracking OG`,
   the registered company. The license itself is unchanged.
+
+### Fixed
+- `contracts create` and `contracts update` explain `--work-days` as the API stores it: seven
+  characters from Monday, 1 for a work day and 0 for a day off, such as `1111100`. The old example
+  `MTWTF--` saved contracts without work days.
 
 ## [1.1.0] - 2026-05-29
 

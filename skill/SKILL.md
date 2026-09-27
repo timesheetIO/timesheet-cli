@@ -30,7 +30,7 @@ Available on every command:
 |------|---------|
 | `--json` | Structured JSON output (always use when parsing) |
 | `--no-color` | Disable ANSI colors |
-| `--api-key <key>` | One-off API key (overrides env + stored creds) |
+| `--api-key <key>` | One-off API key (overrides the stored sign-in) |
 | `--verbose` | Verbose logging |
 | `-q, --quiet` | Suppress non-essential output |
 
@@ -42,12 +42,12 @@ The CLI auto-switches to TSV when stdout is piped, so `| cut`, `| awk`, and frie
 timesheet auth status --json     # check first
 timesheet auth login             # OAuth 2.1 + PKCE (opens browser)
 timesheet auth logout
-timesheet auth apikey --set ts_your.apikey
+timesheet auth apikey --set <your-api-key>
 timesheet auth apikey --show     # masked
 timesheet auth apikey --clear
 ```
 
-For automation set `TIMESHEET_API_KEY=ts_your.apikey`. Exit code `3` means re-authentication is needed.
+For automation, store an API key with `timesheet auth apikey --set`. Exit code `3` means re-authentication is needed.
 
 ## Timer
 

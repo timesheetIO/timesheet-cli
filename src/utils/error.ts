@@ -60,6 +60,21 @@ function capitalize(value: string): string {
 }
 
 /**
+ * The backend's reason for a 403 (e.g. "Business plan required."), or null when it is only the
+ * generic permission refusal.
+ */
+function permissionReason(responseBody?: string): string | null {
+  try {
+    const body = JSON.parse(responseBody ?? '') as { error?: unknown; message?: unknown };
+    return body.error !== 'InvalidPermissionException' && typeof body.message === 'string' && body.message
+      ? body.message.replace(/\.$/, '')
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Map SDK errors to CLI errors with appropriate exit codes
  */
 export function mapSdkError(error: unknown): CLIError {
@@ -85,6 +100,16 @@ export function mapSdkError(error: unknown): CLIError {
 
   if (error instanceof TimesheetApiError && error.statusCode === 402) {
     return new CLIError(formatTierErrorMessage(error.responseBody), ExitCode.TIER_ERROR, error);
+  }
+
+  // Signed in but not allowed: no login helps, so don't suggest one.
+  if (error instanceof TimesheetApiError && error.statusCode === 403) {
+    const reason = permissionReason(error.responseBody);
+    return new CLIError(
+      `You don't have permission to do this${reason ? ` (${reason})` : ''}.`,
+      ExitCode.API_ERROR,
+      error
+    );
   }
 
   if (error instanceof TimesheetApiError) {

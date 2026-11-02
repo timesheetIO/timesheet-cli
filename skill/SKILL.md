@@ -15,7 +15,8 @@ Control [timesheet.io](https://timesheet.io) through the Timesheet connector or 
 Check your tools first. When the Timesheet connector's tools are available, use them instead of the CLI: they need no install or login, and they also work in web and desktop apps, where the CLI usually isn't installed.
 
 - Tool names follow `<area>_<action>` in the singular, such as `timer_start`, `task_list`, `project_create`, and `absence_approve`. Hosts may add a prefix, such as `mcp__timesheet__timer_start`. The CLI's `show` is the tool's `get`.
-- Reports map to `statistics_get` for summaries (up to one year per call) and `export_generate` for xlsx, csv, or pdf exports, which it returns as a download URL. Get its `report` type from `export_report_types`.
+- Reports map to `statistics_get` for summaries (up to one year per call) and `export_generate` for xlsx, csv, or pdf exports, which it returns as a download URL. Get its `report` type from `export_report_types`. Its `title` sets the heading of a PDF export, which is the report's name otherwise.
+- Saved export settings are the `export_template_*` tools, and `export_from_template` runs a template for a period.
 - Take parameters from each tool's input schema, not from the CLI flags below. The workflows and rules in this skill still apply: only the call changes.
 
 Use the CLI when the connector isn't available, for local defaults (`timesheet config`), or when an export must be saved as a file on disk. The connector handles sign-in itself, so `timesheet auth` is for the CLI only.
@@ -244,10 +245,41 @@ timesheet rates delete <id>
 
 ```bash
 timesheet reports summary --json [--this-month | --last-month | -s YYYY-MM-DD -e YYYY-MM-DD] [-p <project-id>]
-timesheet reports export -f xlsx -s 2026-05-01 -e 2026-05-31 [-p <project-id>] [-o /path/out.xlsx]
-timesheet reports export -f csv  --this-month
-timesheet reports export -f pdf  -s 2026-05-01 -e 2026-05-31
+
+# Export: saves the file in the current directory, or at -o (a file or a directory)
+timesheet reports export --last-month -f xlsx
+timesheet reports export -f pdf -s 2026-05-01 -e 2026-05-31 --title "Hours report, Jane Smith" -o hours-may.pdf
+timesheet reports export --this-month -f csv -p <project-id>,<project-id> -u <user-id> --filter billable -o exports/
+timesheet reports export --last-month -f pdf --url-only --json     # download link only, no file
+timesheet reports export --last-month -f pdf --email billing@example.com
+timesheet reports types --json                                      # report IDs and names for -r
 ```
+
+`reports export` options:
+- Period: `--this-month` (up to today, the default), `--last-month`, or `-s YYYY-MM-DD -e YYYY-MM-DD`.
+- `-r, --report <id or name>`: the report type from `reports types`. The default `0` is the data report, one row per time entry; the others group or summarize, and the HR reports (absences, overtime, leave balance) take `--organization <org-id>`.
+- `-f, --format`: `xlsx` (default), `xlsx1904`, `csv`, or `pdf`.
+- Filters take comma-separated IDs: `-p` projects, `-t` teams, `-u` members (user IDs), `--tag` tags. Also `--type all|task|mileage|call` and `--filter all|billable|notBillable|paid|unpaid|billed|outstanding`.
+- `--title "..."` sets the heading of a PDF export; without it the PDF shows the report's name. Excel and CSV files have no title row.
+- `--summarize` adds a totals row, `--split-tasks` splits tasks at their breaks, and `--filename` names the file (default `timesheet`).
+- With `--json`, the output has the saved `file` and the `url` it came from.
+
+## Export templates
+
+Saved export settings (report, format, filters, file name, PDF title) to run for any period.
+
+```bash
+timesheet reports templates list --json [-q "monthly"] [-l 50]
+timesheet reports templates show <template-id> --json
+timesheet reports templates create "Monthly hours" -f pdf --title "Hours report, Jane Smith" \
+  [-r <report>] [-p <project-ids>] [-u <user-ids>] [--filter billable] [--summarize] [--filename hours]
+timesheet reports templates update <template-id> --title "Hours report, October"
+timesheet reports templates update <template-id> --title ""     # PDF shows the report name again
+timesheet reports templates run <template-id> --last-month [-o <file-or-directory>] [--url-only] [--email <address>]
+timesheet reports templates delete <template-id> --force
+```
+
+`update` changes only the options you pass, and an empty value clears one, such as `--title ""` or `-p ""`. `run` takes the same period and delivery options as `reports export`.
 
 ## Profile & settings
 

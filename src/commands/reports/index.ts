@@ -1,10 +1,12 @@
 import { Command } from 'commander';
-import { format, subDays, startOfMonth, endOfMonth } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { getClient } from '../../sdk/index.js';
 import { createFormatter, output, newline } from '../../output/index.js';
 import { createSpinner, formatDurationSeconds } from '../../utils/index.js';
 import type { GlobalOptions } from '../../types/index.js';
 import type { Task } from '@timesheet/sdk';
+import { registerReportsExportCommands, resolvePeriod } from './export.js';
+import { registerReportsTemplatesCommands } from './templates.js';
 
 export function registerReportsCommands(program: Command): void {
   const reports = program
@@ -38,25 +40,11 @@ export function registerReportsCommands(program: Command): void {
         const globalOptions = command.optsWithGlobals<GlobalOptions>();
         const formatter = createFormatter(globalOptions);
         const spinner = createSpinner(!globalOptions.quiet && !globalOptions.json);
+        // The period as local days: new Date('2026-10-01') is UTC midnight, the day before west of UTC.
+        const period = resolvePeriod(options);
+        const startDate = parseISO(period.startDate);
+        const endDate = parseISO(period.endDate);
         const client = await getClient(globalOptions);
-
-        // Calculate date range
-        let startDate: Date;
-        let endDate: Date;
-
-        if (options.thisMonth) {
-          startDate = startOfMonth(new Date());
-          endDate = new Date();
-        } else if (options.lastMonth) {
-          const lastMonth = subDays(startOfMonth(new Date()), 1);
-          startDate = startOfMonth(lastMonth);
-          endDate = endOfMonth(lastMonth);
-        } else {
-          startDate = options.startDate
-            ? new Date(options.startDate)
-            : startOfMonth(new Date());
-          endDate = options.endDate ? new Date(options.endDate) : new Date();
-        }
 
         spinner.start('Loading report data...');
 
@@ -148,82 +136,6 @@ export function registerReportsCommands(program: Command): void {
       }
     );
 
-  // Export command
-  reports
-    .command('export')
-    .description('Export timesheet data')
-    .requiredOption(
-      '-f, --format <format>',
-      'Export format (xlsx, csv, pdf)'
-    )
-    .requiredOption('-s, --start-date <date>', 'Start date (YYYY-MM-DD)')
-    .requiredOption('-e, --end-date <date>', 'End date (YYYY-MM-DD)')
-    .option('-p, --project <project-id>', 'Filter by project')
-    .option('-o, --output <file>', 'Output file path')
-    .action(
-      async (
-        options: {
-          format: string;
-          startDate: string;
-          endDate: string;
-          project?: string;
-          output?: string;
-        },
-        command: Command
-      ) => {
-        const globalOptions = command.optsWithGlobals<GlobalOptions>();
-        const formatter = createFormatter(globalOptions);
-        const spinner = createSpinner(!globalOptions.quiet && !globalOptions.json);
-        const client = await getClient(globalOptions);
-
-        const validFormats = ['xlsx', 'csv', 'pdf'];
-        if (!validFormats.includes(options.format.toLowerCase())) {
-          output(
-            formatter,
-            formatter.formatError(
-              `Invalid format. Use one of: ${validFormats.join(', ')}`
-            )
-          );
-          process.exit(2);
-        }
-
-        spinner.start(`Generating ${options.format.toUpperCase()} export...`);
-
-        try {
-          // Note: The actual export API might differ - this is a placeholder
-          // for the real implementation based on the SDK's export capabilities
-          await client.reports.export.generate({
-            report: 1, // Default report type
-            startDate: options.startDate,
-            endDate: options.endDate,
-            format: options.format as 'xlsx' | 'csv' | 'pdf',
-            projectIds: options.project ? [options.project] : undefined,
-          });
-
-          spinner.stop();
-
-          if (globalOptions.json) {
-            output(formatter, {
-              success: true,
-              format: options.format,
-              startDate: options.startDate,
-              endDate: options.endDate,
-            });
-            return;
-          }
-
-          output(formatter, formatter.formatSuccess('Export generated!'));
-          newline();
-          output(
-            formatter,
-            formatter.formatHint(
-              'Check your downloads or the specified output path.'
-            )
-          );
-        } catch (error) {
-          spinner.fail('Export failed');
-          throw error;
-        }
-      }
-    );
+  registerReportsExportCommands(reports);
+  registerReportsTemplatesCommands(reports);
 }

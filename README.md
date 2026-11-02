@@ -131,8 +131,44 @@ Use `--help` on any command to see its available filters, e.g. `timesheet expens
 # Time summary
 timesheet reports summary --this-month
 
-# Export data
-timesheet reports export -f xlsx -s 2024-01-01 -e 2024-01-31
+# Export last month as Excel, saved as timesheet_<start>_<end>.xlsx in the current directory
+timesheet reports export --last-month
+
+# PDF export with your own heading instead of the report name, saved to a file of your choice
+timesheet reports export -f pdf -s 2024-01-01 -e 2024-01-31 --title "Hours report, Jane Smith" -o hours.pdf
+
+# Billable time of two projects as CSV, saved into a folder
+timesheet reports export --this-month -f csv -p <project-id>,<project-id> --filter billable -o exports/
+
+# Print the download link instead of saving the file, or email the export
+timesheet reports export --last-month --url-only
+timesheet reports export --last-month -f pdf --email billing@example.com
+
+# Report types for --report (default 0, the data report with one row per time entry)
+timesheet reports types
+```
+
+`reports export` takes a period (`--this-month`, the default, `--last-month`, or `-s`/`-e`), a
+report (`-r`, an ID or name), a format (`-f xlsx|xlsx1904|csv|pdf`), filters (`-p` projects, `-t`
+teams, `-u` members, `--tag`, `--type`, `--filter`), and `--title`, `--filename`, `--summarize` and
+`--split-tasks`. The HR reports take `--organization <id>`. Run `timesheet reports export --help` for
+all of them.
+
+### Export Templates
+
+Templates save export settings to run for any period:
+
+```bash
+timesheet reports templates list
+timesheet reports templates create "Monthly hours" -f pdf --title "Hours report, Jane Smith" --summarize
+timesheet reports templates show <id>
+timesheet reports templates run <id> --last-month -o exports/
+
+# Options you leave out stay as they are; an empty value clears one
+timesheet reports templates update <id> --title "Hours report, October"
+timesheet reports templates update <id> --title ""
+
+timesheet reports templates delete <id>
 ```
 
 ### Profile & Settings

@@ -87,12 +87,15 @@ export async function getClient(options?: GlobalOptions): Promise<TimesheetClien
     }
 
     const baseUrl = getConfig('apiUrl');
+    // Exports, templates and report PDFs go to the reports service: without this they always hit production.
+    const reportsBaseUrl = getConfig('reportsUrl');
 
     // Try API key authentication first
     if (apiKey) {
         clientInstance = new TimesheetClient({
             apiKey,
             baseUrl,
+            reportsBaseUrl,
         });
         currentAuthMethod = 'apikey';
         return clientInstance;
@@ -116,6 +119,7 @@ export async function getClient(options?: GlobalOptions): Promise<TimesheetClien
                 clientInstance = new TimesheetClient({
                     authentication: auth,
                     baseUrl,
+                    reportsBaseUrl,
                 });
                 currentAuthMethod = 'oauth';
                 return clientInstance;
@@ -136,6 +140,7 @@ export async function getClient(options?: GlobalOptions): Promise<TimesheetClien
         clientInstance = new TimesheetClient({
             authentication: auth,
             baseUrl,
+            reportsBaseUrl,
         });
         currentAuthMethod = 'oauth';
         return clientInstance;

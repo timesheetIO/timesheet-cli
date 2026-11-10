@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.0] - 2026-11-02
+## [1.2.0] - 2026-11-10
 
 ### Added
 - `reports export --title <title>` sets the heading printed at the top of a PDF export, such as
@@ -34,6 +34,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - `reports export` no longer requires `-f`, `-s` and `-e`: the format defaults to `xlsx` and the
   period to this month up to today, as in `reports summary`.
+
+### Changed
+- Requires `@timesheet/sdk` 1.5.0, the first published SDK version with the PDF title on exports
+  and export templates.
 
 ## [1.1.1] - 2026-09-27
 

@@ -2,8 +2,11 @@
 name: timesheet
 description: Track time and manage projects, tasks, absences, contracts, expenses, todos, and team data in timesheet.io, with the Timesheet connector's tools when they are available and the @timesheet/cli command-line tool otherwise
 user-invocable: true
-homepage: https://timesheet.io
-metadata: {"requires": {"bins": ["timesheet"]}}
+homepage: "https://timesheet.io"
+metadata:
+  requires:
+    bins:
+      - timesheet
 ---
 
 # Timesheet Skill

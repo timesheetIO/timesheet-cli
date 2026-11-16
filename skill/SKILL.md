@@ -8,20 +8,30 @@ metadata: {"requires": {"bins": ["timesheet"]}}
 
 # Timesheet Skill
 
-Control [timesheet.io](https://timesheet.io) through the Timesheet connector or from the shell. Default to non-destructive reads first (status, list, show) before mutating state.
+Control [timesheet.io](https://timesheet.io) through the Timesheet connector or from the shell. Before you change or delete an existing record, read it first. Starting the timer and adding a time entry need no read first.
 
 ## Connector or CLI
 
 Check your tools first. When the Timesheet connector's tools are available, use them instead of the CLI: they need no install or login, and they also work in web and desktop apps, where the CLI usually isn't installed.
 
-- Tool names follow `<area>_<action>` in the singular, such as `timer_start`, `task_list`, `project_create`, and `absence_approve`. Hosts may add a prefix, such as `mcp__timesheet__timer_start`. The CLI's `show` is the tool's `get`.
+- Tool names follow `<area>_<action>` in the singular, such as `timer_start`, `task_list`, `project_create`, and `absence_approve`. Hosts may add a prefix, such as `mcp__timesheet__timer_start`. The CLI's `show` is the tool's `get`. The `show_*` tools are something else: they show a card (see the next section).
 - Reports map to `statistics_get` for summaries (up to one year per call) and `export_generate` for xlsx, csv, or pdf exports, which it returns as a download URL. Get its `report` type from `export_report_types`. Its `title` sets the heading of a PDF export, which is the report's name otherwise.
 - Saved export settings are the `export_template_*` tools, and `export_from_template` runs a template for a period.
-- Take parameters from each tool's input schema, not from the CLI flags below. The workflows and rules in this skill still apply: only the call changes.
+- Take parameters from each tool's input schema, not from the CLI flags below. The CLI workflows further down are for the CLI: with the connector, follow the next section.
 
 Use the CLI when the connector isn't available, for local defaults (`timesheet config`), or when an export must be saved as a file on disk. The connector handles sign-in itself, so `timesheet auth` is for the CLI only.
 
 With the CLI, use `--json` on every read command so output is machine-parseable.
+
+## Connector: one request, one card
+
+In chat apps, the connector shows cards. Every action tool (such as `timer_start`, `task_create`, and the update tools) and every `show_*` tool adds one card to the conversation, so make only the calls the request needs.
+
+- **Act directly.** `timer_start` and `task_create` take the project's name in `project`, as the user said it. A timer is named after its project: in "start the Acme timer", Acme is the project, not the description. Don't call `project_list` or `timer_status` first. The result says when a timer is already running, or when the name matches no project or several: ask the user then, and call again with the `projectId` from the result.
+- **Put the description in the same call.** `timer_start` and `timer_stop` take a `description`, so it needs no `timer_update`.
+- **Look things up silently.** The list, get, and status tools, such as `project_list`, `task_get`, and `timer_status`, return data to you and show nothing to the user. Use them when you need an ID or a value for another step.
+- **Show when the user asks to see something.** Call the matching show tool once, with the filters: `show_timer`, `show_projects`, `show_time_entries`, `show_statistics`, or `show_export_templates`. It returns the same data as the list tool, so don't call both.
+- **Keep the answer short.** When a card shows the details, add one or two sentences and don't repeat every value on it.
 
 ## Global flags
 
@@ -304,7 +314,7 @@ timesheet config reset
 
 Stored in `~/.timesheet-cli/`. Override at runtime with `TIMESHEET_*` environment variables (e.g. `TIMESHEET_COLORS=false`).
 
-## Common workflows
+## Common workflows (CLI)
 
 ### Log time for current work
 1. `timesheet timer status --json`

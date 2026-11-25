@@ -159,8 +159,7 @@ timesheet absences list --json [-o <org-id>] [-c <contract-id>] [-u <user-id>] \
   [--year 2026] [--exclude-rejected] [-q "vacation"] [-l 50]
 timesheet absences show <id> --json
 timesheet absences create -c <contract-id> -t <type-id> -s 2026-06-01 -e 2026-06-05 \
-  [--full-day] [-r "Annual leave"] [--documentation-url <url>] \
-  [--file-name "doctor.pdf"] [--file-uri "..."]
+  [--full-day] [-r "Annual leave"]
 timesheet absences update <id> [options]
 timesheet absences approve <id> [-o <org-id>]
 timesheet absences reject <id> -r "Reason" [-o <org-id>]
